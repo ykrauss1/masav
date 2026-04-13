@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מערכת הוראות קבע</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+:root{--bg:#0c0e14;--surface:#13161f;--surface2:#1c2030;--surface3:#242840;--border:#2a2f4a;--border2:#353b5e;--accent:#5b7fff;--accent2:#00d4aa;--danger:#ff5068;--warning:#ffb340;--text:#e4e8ff;--text-dim:#6b73a0;--text-mid:#9ba3cc;--radius:10px;--shadow:0 8px 32px rgba(0,0,0,0.4);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;font-size:14px;}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse 80% 60% at 20% 50%,#1a2050 0%,var(--bg) 70%);}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:48px 40px;width:360px;box-shadow:var(--shadow);text-align:center;}
+.login-box h1{font-size:22px;font-weight:800;margin-bottom:6px;}
+.login-box p{color:var(--text-dim);font-size:13px;margin-bottom:32px;}
+.login-box input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 16px;color:var(--text);font-family:'Heebo',sans-serif;font-size:18px;letter-spacing:6px;text-align:center;direction:ltr;outline:none;margin-bottom:14px;transition:border-color .2s;}
+.login-box input:focus{border-color:var(--accent);}
+.login-err{color:var(--danger);font-size:12px;min-height:18px;margin-top:8px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius);font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:#4a6eee;transform:translateY(-1px);}
+.btn-success{background:var(--accent2);color:#0c0e14;}.btn-success:hover{background:#00bfa0;}
+.btn-danger{background:var(--danger);color:#fff;}.btn-danger:hover{background:#e83d55;}
+.btn-ghost{background:var(--surface2);color:var(--text-mid);border:1px solid var(--border);}.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-full{width:100%;justify-content:center;padding:13px;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+#app{display:none;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.topbar-brand{font-size:17px;font-weight:800;}.topbar-brand span{color:var(--accent);}
+.nav{display:flex;gap:2px;}
+.nav-btn{padding:7px 15px;border-radius:8px;background:none;border:none;color:var(--text-dim);font-family:'Heebo',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.nav-btn:hover{color:var(--text);background:var(--surface2);}.nav-btn.active{color:var(--accent);background:rgba(91,127,255,.12);}
+.content{padding:28px;max-width:1280px;margin:0 auto;}
+.page{display:none;}.page.active{display:block;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+.ph-left h1{font-size:22px;font-weight:800;}.ph-left p{color:var(--text-dim);font-size:13px;margin-top:3px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+.stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.stat-val{font-size:26px;font-weight:800;}.stat-val.blue{color:var(--accent);}.stat-val.green{color:var(--accent2);}.stat-val.warn{color:var(--warning);}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--surface2);padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);}
+td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(91,127,255,.03);}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-on{background:rgba(0,212,170,.15);color:var(--accent2);}.badge-off{background:rgba(255,80,104,.12);color:var(--danger);}.badge-warn{background:rgba(255,179,64,.15);color:var(--warning);}
+.empty-state{text-align:center;padding:52px;color:var(--text-dim);}.empty-state .ei{font-size:36px;margin-bottom:12px;}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.search-box{flex:1;min-width:200px;max-width:320px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;color:var(--text);font-family:'Heebo',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.search-box:focus{border-color:var(--accent);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow);}
+.modal h2{font-size:18px;font-weight:800;margin-bottom:24px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+.fg{display:flex;flex-direction:column;gap:5px;}.fg label{font-size:12px;font-weight:700;color:var(--text-dim);}
+.fg input,.fg select,.fg textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Heebo',sans-serif;font-size:13px;outline:none;transition:border-color .2s;direction:rtl;}
+.fg input:focus,.fg select:focus{border-color:var(--accent);}.fg select option{background:var(--surface2);}
+.fg input[type=number]{direction:ltr;text-align:right;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}.form-grid .full{grid-column:1/-1;}
+.form-section{border-top:1px solid var(--border);padding-top:18px;margin-top:18px;grid-column:1/-1;}
+.form-section-title{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.commit-list{display:flex;flex-direction:column;gap:8px;}
+.commit-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start;}
+.commit-card .cc-type{background:rgba(91,127,255,.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;display:inline-block;margin-bottom:4px;}
+.commit-card .cc-serial{color:var(--text-dim);font-size:12px;}
+.commit-card .cc-amount{font-size:18px;font-weight:800;color:var(--accent2);}
+.commit-card .cc-total{font-size:12px;color:var(--warning);font-weight:600;}
+.commit-card .cc-progress{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.commit-card .cc-dates{font-size:11px;color:var(--text-dim);margin-top:4px;}
+.commit-card .cc-actions{display:flex;gap:6px;flex-direction:column;align-items:flex-end;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:11px 22px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}.toast.ok{border-color:var(--accent2);color:var(--accent2);}.toast.err{border-color:var(--danger);color:var(--danger);}
+.gen-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:20px;}
+.gen-card h2{font-size:16px;font-weight:700;margin-bottom:18px;}
+.inst-check-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;}
+.inst-check{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border-radius:8px;cursor:pointer;}
+.inst-check input[type=checkbox]{width:auto;}
+.inst-check .ic-name{flex:1;font-size:13px;}.inst-check .ic-count{font-size:11px;color:var(--text-dim);}
+.preview-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:18px;font-family:monospace;font-size:11px;color:var(--accent2);max-height:320px;overflow-y:auto;white-space:pre;direction:ltr;text-align:left;}
+.acct-valid{border-color:var(--accent2)!important;}.acct-invalid{border-color:var(--danger)!important;}
+.acct-hint{font-size:11px;margin-top:4px;min-height:16px;}.acct-hint.ok{color:var(--accent2);}.acct-hint.bad{color:var(--danger);}
+.ltr{direction:ltr;text-align:left;}
+.client-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.client-detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.client-detail-header h2{font-size:18px;font-weight:800;}
+.back-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;padding:4px 8px;}
+.back-btn:hover{color:var(--accent);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <h1>🏦 הוראות קבע</h1>
+    <p>הזן סיסמה להמשך</p>
+    <input type="password" id="pw" placeholder="••••••" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn btn-primary btn-full" onclick="login()">כניסה</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-brand">הוראות <span>קבע</span></div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="showPage('dashboard',this)">סקירה</button>
+      <button class="nav-btn" onclick="showPage('institutions',this)">מוסדות</button>
+      <button class="nav-btn" onclick="showPage('clients',this)">לקוחות</button>
+      <button class="nav-btn" onclick="showPage('types',this)">סוגי התחייבות</button>
+      <button class="nav-btn" onclick="showPage('generate',this)">יצירת קובץ</button>
+    </nav>
+    <button class="btn btn-ghost btn-sm" onclick="logout()">יציאה</button>
+  </header>
+
+  <div class="content">
+
+    <div class="page active" id="page-dashboard">
+      <div class="ph"><div class="ph-left"><h1>סקירה כללית</h1><p id="dash-date"></p></div></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">מוסדות פעילים</div><div class="stat-val blue" id="s-inst">—</div></div>
+        <div class="stat"><div class="stat-label">לקוחות פעילים</div><div class="stat-val blue" id="s-clients">—</div></div>
+        <div class="stat"><div class="stat-label">התחייבויות פעילות</div><div class="stat-val blue" id="s-commits">—</div></div>
+        <div class="stat"><div class="stat-label">סה"כ חיוב חודשי</div><div class="stat-val green" id="s-total">—</div></div>
+        <div class="stat"><div class="stat-label">קבצים שנוצרו</div><div class="stat-val" id="s-files">0</div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:13px;color:var(--text-dim);">מוסדות לפי גובה חיוב חודשי</div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDashAll(this)">הצג הכל</button>
+      </div>
+      <div class="table-wrap" id="dash-table"><div class="empty-state"><div class="ei">⏳</div>טוען...</div></div>
+    </div>
+
+    <div class="page" id="page-institutions">
+      <div class="ph">
+        <div class="ph-left"><h1>מוסדות</h1><p>ניהול המוסדות המחייבים</p></div>
+        <button class="btn btn-primary" onclick="openInstModal()">+ מוסד חדש</button>
+      </div>
+      <div class="toolbar"><input class="search-box" placeholder="חיפוש..." id="inst-search" oninput="renderInst()"></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>שם המוסד</th><th>מספר מוסד</th><th>יום גביה</th><th>בנק</th><th>לקוחות</th><th>עיכוב</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+        <tbody id="inst-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="page-clients">
+      <div id="clients-list-view">
+        <div class="ph">
+          <div class="ph-left"><h1>לקוחות</h1><p>ניהול לקוחות והתחייבויות</p></div>
+          <button class="btn btn-primary" onclick="openClientModal()">+ לקוח חדש</button>
+        </div>
+        <div class="toolbar">
+          <input class="search-box" placeholder="חיפוש לקוח..." id="client-search" oninput="renderClients()">
+          <select class="search-box" style="flex:none;width:200px;" id="client-filter-inst" onchange="renderClients()"><option value="">כל המוסדות</option></select>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>שם לקוח</th><th>מוסד</th><th>בנק</th><th>חשבון</th><th>התחייבויות</th><th>סה"כ חודשי</th><th>עיכוב</th><th>פעולות</th></tr></thead>
+          <tbody id="clients-tbody"></tbody></table>
+        </div>
+      </div>
+      <div id="client-detail-view" style="display:none;">
+        <div class="client-detail">
+          <div class="client-detail-header">
+            <button class="back-btn" onclick="closeClientDetail()">→</button>
+            <h2 id="cd-name"></h2>
+            <span id="cd-inst-name" style="color:var(--text-dim);font-size:13px;"></span>
+            <button class="btn btn-primary btn-sm" onclick="openCommitModal()" style="margin-right:auto;">+ התחייבות</button>
+          </div>
+          <div id="cd-commits" class="commit-list"><div class="empty-state"><div class="ei">📋</div>אין התחייבויות עדיין</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-types">
+      <div class="ph">
+        <div class="ph-left"><h1>סוגי התחייבות</h1><p>הגדר סוגים כגון הפקדה, הלוואה, תרומה</p></div>
+        <button class="btn btn-primary" onclick="openTypeModal()">+ סוג חדש</button>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>שם הסוג</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+        <tbody id="types-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="page-generate">
+      <div class="ph"><div class="ph-left"><h1>גביה ודוחות</h1></div></div>
+
+      <!-- קובץ מס"ב -->
+      <div class="gen-card">
+        <h2>⬇ יצירת קובץ מס"ב</h2>
+        <div class="form-grid" style="margin-bottom:20px;">
+          <div class="fg"><label>תאריך חיוב</label><input type="date" id="gen-date"></div>
+          <div class="fg"><label>יום גביה</label>
+            <select id="gen-day" onchange="renderGenInst()">
+              <option value="5">5 לחודש</option><option value="10">10 לחודש</option>
+              <option value="20" selected>20 לחודש</option><option value="0">כל הימים</option>
+            </select>
+          </div>
+          <div class="fg"><label>מספר רץ</label><input type="number" id="gen-seq" value="1" min="1" max="9999" class="ltr"></div>
+        </div>
+        <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:var(--text-dim);">בחר מוסדות:</div>
+        <div class="inst-check-list" id="gen-inst-list"></div>
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button class="btn btn-primary" onclick="generateFile()">⬇ הורד קובץ</button>
+          <button class="btn btn-ghost" onclick="previewFile()">👁 תצוגה מקדימה</button>
+        </div>
+      </div>
+      <div class="gen-card" id="preview-card" style="display:none;">
+        <h2>תצוגה מקדימה</h2>
+        <div class="preview-box" id="preview-box"></div>
+      </div>
+
+      <!-- דוחות גביה -->
+      <div class="gen-card">
+        <h2>📧 שליחת דוחות גביה למוסדות</h2>
+        <div class="form-grid" style="margin-bottom:20px;">
+          <div class="fg">
+            <label>שער דולר</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="number" id="rep-rate" placeholder="3.50" step="0.01" class="ltr" style="width:120px;">
+              <button class="btn btn-ghost btn-sm" onclick="fetchDollarRate()" id="rate-btn">🔄 שלוף אוטומטי</button>
+            </div>
+            <div class="acct-hint" id="rate-hint"></div>
+          </div>
+          <div class="fg"><label>יום גביה לדוח</label>
+            <select id="rep-day">
+              <option value="5">5 לחודש</option>
+              <option value="10">10 לחודש</option>
+              <option value="20" selected>20 לחודש</option>
+              <option value="0">כל הימים</option>
+            </select>
+          </div>
+          <div class="fg"><label>תאריך חיוב לדוח</label><input type="date" id="rep-date"></div>
+          <div class="fg" style="align-self:end;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="rep-copy-me" checked style="width:auto;">
+              שלח עותק אלי (ykrauss1@gmail.com)
+            </label>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:var(--text-dim);">בחר מוסדות לשליחה:</div>
+        <div class="inst-check-list" id="rep-inst-list"></div>
+        <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="sendReports()">📧 שלח דוחות במייל</button>
+          <button class="btn btn-ghost" onclick="previewReport()">👁 תצוגה מקדימה של דוח</button>
+        </div>
+        <div id="rep-status" style="margin-top:16px;"></div>
+      </div>
+
+      <!-- תצוגה מקדימה דוח -->
+      <div id="report-preview-wrap" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:15px;font-weight:700;">תצוגה מקדימה – דוח גביה</div>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('report-preview-wrap').style.display='none'">✕ סגור</button>
+        </div>
+        <div id="report-preview-frame" style="background:white;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Institution Modal -->
+<div class="overlay" id="inst-modal"><div class="modal">
+  <h2 id="inst-modal-title">מוסד חדש</h2>
+  <div class="form-grid">
+    <div class="fg full"><label>שם המוסד *</label><input id="im-name" placeholder="שם המוסד"></div>
+    <div class="fg"><label>ע"מ / ח.פ</label><input id="im-vat" placeholder="123456789" class="ltr" maxlength="9"></div>
+    <div class="fg"><label>מספר מוסד (5 ספרות)</label><input id="im-code" placeholder="12345" class="ltr" maxlength="5"></div>
+    <div class="fg"><label>ספרות ביקורת (3 ספרות)</label><input id="im-check" placeholder="123" class="ltr" maxlength="3"></div>
+    <div class="fg"><label>בנק</label><select id="im-bank" onchange="validateInstAccount()"><option value="">-- בחר בנק --</option></select></div>
+    <div class="fg"><label>סניף</label><input id="im-branch" placeholder="123" class="ltr" maxlength="4" oninput="validateInstAccount()"></div>
+    <div class="fg full"><label>מספר חשבון</label>
+      <input id="im-account" placeholder="123456789" class="ltr" oninput="validateInstAccount()">
+      <div class="acct-hint" id="im-account-hint"></div>
+    </div>
+    <div class="fg"><label>יום גביה ברירת מחדל</label>
+      <select id="im-debit-day"><option value="5">5 לחודש</option><option value="10">10 לחודש</option><option value="20" selected>20 לחודש</option></select>
+    </div>
+    <div class="fg"><label>מספר סידורי התחלתי</label><input type="number" id="im-serial-start" value="1" min="1" class="ltr"></div>
+    <div class="form-section">
+      <div class="form-section-title">איש קשר</div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="fg"><label>שם</label><input id="im-contact-name" placeholder="שם איש קשר"></div>
+        <div class="fg"><label>טלפון</label><input id="im-contact-phone" placeholder="050-0000000" class="ltr"></div>
+        <div class="fg full"><label>אימייל</label><input type="email" id="im-contact-email" placeholder="contact@example.com" class="ltr"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">עיכוב גביה</div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="fg"><label>סוג עיכוב</label>
+          <select id="im-suspend" onchange="toggleSuspendDates('im')">
+            <option value="none">ללא עיכוב</option><option value="temporary">זמני (מ-עד)</option><option value="permanent">קבוע</option>
+          </select>
+        </div>
+        <div class="fg" id="im-suspend-from-wrap" style="display:none;"><label>מתאריך</label><input type="date" id="im-suspend-from"></div>
+        <div class="fg" id="im-suspend-until-wrap" style="display:none;"><label>עד תאריך</label><input type="date" id="im-suspend-until"></div>
+      </div>
+    </div>
+    <div class="fg" style="grid-column:1/-1;"><label>סטטוס</label>
+      <select id="im-active"><option value="true">פעיל</option><option value="false">לא פעיל</option></select>
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('inst-modal')">ביטול</button>
+    <button class="btn btn-primary" onclick="saveInst()">שמירה</button>
+  </div>
+</div></div>
+
+<!-- Client Modal -->
+<div class="overlay" id="client-modal"><div class="modal">
+  <h2 id="client-modal-title">לקוח חדש</h2>
+  <div class="form-grid">
+    <div class="fg full"><label>שם הלקוח *</label><input id="cm-name" placeholder="שם מלא"></div>
+    <div class="fg full"><label>מוסד *</label>
+      <select id="cm-inst" onchange="onClientInstChange()"><option value="">-- בחר מוסד --</option></select>
+    </div>
+    <div class="fg"><label>בנק *</label><select id="cm-bank" onchange="validateClientAccount()"><option value="">-- בחר בנק --</option></select></div>
+    <div class="fg"><label>סניף *</label><input id="cm-branch" placeholder="123" class="ltr" maxlength="4" oninput="validateClientAccount()"></div>
+    <div class="fg full"><label>מספר חשבון *</label>
+      <input id="cm-account" placeholder="123456789" class="ltr" oninput="validateClientAccount()">
+      <div class="acct-hint" id="cm-account-hint"></div>
+    </div>
+    <div class="fg"><label>יום גביה</label>
+      <select id="cm-debit-day"><option value="5">5 לחודש</option><option value="10">10 לחודש</option><option value="20">20 לחודש</option></select>
+    </div>
+    <div class="fg"><label>סטטוס</label><select id="cm-active"><option value="true">פעיל</option><option value="false">לא פעיל</option></select></div>
+    <div class="form-section">
+      <div class="form-section-title">עיכוב גביה</div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="fg"><label>סוג עיכוב</label>
+          <select id="cm-suspend" onchange="toggleSuspendDates('cm')">
+            <option value="none">ללא עיכוב</option><option value="temporary">זמני (מ-עד)</option><option value="permanent">קבוע</option>
+          </select>
+        </div>
+        <div class="fg" id="cm-suspend-from-wrap" style="display:none;"><label>מתאריך</label><input type="date" id="cm-suspend-from"></div>
+        <div class="fg" id="cm-suspend-until-wrap" style="display:none;"><label>עד תאריך</label><input type="date" id="cm-suspend-until"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('client-modal')">ביטול</button>
+    <button class="btn btn-primary" onclick="saveClient()">שמירה</button>
+  </div>
+</div></div>
+
+<!-- Commitment Modal -->
+<div class="overlay" id="commit-modal"><div class="modal">
+  <h2 id="commit-modal-title">התחייבות חדשה</h2>
+  <div class="form-grid">
+    <div class="fg full"><label>סוג התחייבות *</label><select id="kom-type"></select></div>
+    <div class="fg"><label>מספר סידורי</label><input type="number" id="kom-serial" class="ltr" readonly style="opacity:.6;"></div>
+    <div class="fg"><label>סכום חיוב חודשי (₪) *</label><input type="number" id="kom-amount" placeholder="500" step="0.01" class="ltr"></div>
+    <div class="fg"><label>יום גביה</label>
+      <select id="kom-day"><option value="5">5 לחודש</option><option value="10">10 לחודש</option><option value="20">20 לחודש</option></select>
+    </div>
+    <div class="fg"><label>מספר תשלומים (999=ללא הגבלה)</label><input type="number" id="kom-total" value="999" min="1" class="ltr"></div>
+    <div class="fg"><label>תשלומים שבוצעו</label><input type="number" id="kom-made" value="0" min="0" class="ltr"></div>
+    <div class="fg"><label>תאריך התחלה</label><input type="date" id="kom-start"></div>
+    <div class="fg"><label>סטטוס</label><select id="kom-active"><option value="true">פעיל</option><option value="false">לא פעיל</option></select></div>
+    <div class="form-section">
+      <div class="form-section-title">עיכוב גביה</div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="fg"><label>סוג עיכוב</label>
+          <select id="kom-suspend" onchange="toggleSuspendDates('kom')">
+            <option value="none">ללא עיכוב</option><option value="temporary">זמני (מ-עד)</option><option value="permanent">קבוע</option>
+          </select>
+        </div>
+        <div class="fg" id="kom-suspend-from-wrap" style="display:none;"><label>מתאריך</label><input type="date" id="kom-suspend-from"></div>
+        <div class="fg" id="kom-suspend-until-wrap" style="display:none;"><label>עד תאריך</label><input type="date" id="kom-suspend-until"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('commit-modal')">ביטול</button>
+    <button class="btn btn-primary" onclick="saveCommit()">שמירה</button>
+  </div>
+</div></div>
+
+<!-- Type Modal -->
+<div class="overlay" id="type-modal"><div class="modal" style="width:380px;">
+  <h2 id="type-modal-title">סוג התחייבות חדש</h2>
+  <div class="fg full" style="margin-bottom:14px;"><label>שם הסוג *</label><input id="tm-name" placeholder="לדוגמה: תרומה"></div>
+  <div class="fg"><label>סטטוס</label><select id="tm-active"><option value="true">פעיל</option><option value="false">לא פעיל</option></select></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('type-modal')">ביטול</button>
+    <button class="btn btn-primary" onclick="saveType()">שמירה</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://cdgqodtbdhsqkvcgcdlm.supabase.co';
+const SB_KEY='sb_publishable_B4HOCQF3IxN_6Ojz1_ctnA_k6JEAR4g';
+const PASSWORD='Yossi100';
+let banks=[],institutions=[],clients=[],commitments=[],commitTypes=[];
+let editInstId=null,editClientId=null,editCommitId=null,editTypeId=null;
+let currentClientId=null,fileCount=0;
+
+function login(){
+  if(document.getElementById('pw').value===PASSWORD){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  }else{
+    document.getElementById('login-err').textContent='סיסמה שגויה';
+    setTimeout(()=>document.getElementById('login-err').textContent='',2000);
+  }
+}
+function logout(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pw').value='';}
+
+async function sbGet(t,e=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?order=created_at.asc${e}`,{headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}});return r.json();}
+async function sbPost(t,d){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(d)});return r.json();}
+async function sbPatch(t,id,d){await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(d)});}
+async function sbDelete(t,id){await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}});}
+
+async function initApp(){
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('he-IL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('gen-date').value=new Date().toISOString().split('T')[0];
+  await loadAll();
+}
+
+async function loadAll(){
+  [banks,institutions,clients,commitments,commitTypes]=await Promise.all([
+    sbGet('masav_banks','&order=bank_name.asc'),
+    sbGet('masav_institutions'),sbGet('masav_clients'),
+    sbGet('masav_commitments'),sbGet('masav_commitment_types','&order=id.asc')
+  ]);
+  [banks,institutions,clients,commitments,commitTypes]=
+    [banks,institutions,clients,commitments,commitTypes].map(a=>Array.isArray(a)?a:[]);
+  renderAll();
+}
+
+function renderAll(){renderDash();renderInst();renderClients();renderTypes();renderGenInst();populateSelects();}
+
+function instName(id){return institutions.find(i=>i.id===id)?.name||'—';}
+function bankName(c){return banks.find(b=>b.bank_code===c)?.bank_name||c||'—';}
+function typeName(id){return commitTypes.find(t=>t.id===id)?.name||'—';}
+function clientCommits(cid){return commitments.filter(c=>c.client_id===cid);}
+function isSuspended(o){
+  if(o.suspend_type==='permanent')return true;
+  if(o.suspend_type==='temporary'){
+    const now=new Date(),from=o.suspend_from?new Date(o.suspend_from):null,until=o.suspend_until?new Date(o.suspend_until):null;
+    if(from&&until)return now>=from&&now<=until;
+    if(from)return now>=from;
+  }
+  return false;
+}
+function suspendBadge(o){
+  if(o.suspend_type==='permanent')return '<span class="badge badge-warn">מעוכב</span>';
+  if(o.suspend_type==='temporary'&&isSuspended(o))return '<span class="badge badge-warn">מעוכב זמנית</span>';
+  return '';
+}
+function fmt(n){return '₪'+Number(n||0).toLocaleString('he-IL',{minimumFractionDigits:0});}
+function clientMonthly(cid){return clientCommits(cid).filter(c=>c.is_active&&!isSuspended(c)).reduce((s,c)=>s+(parseFloat(c.amount)||0),0);}
+
+function populateSelects(){
+  const bankOpts=banks.map(b=>`<option value="${b.bank_code}">${b.bank_name} (${b.bank_code})</option>`).join('');
+  ['im-bank','cm-bank'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<option value="">-- בחר בנק --</option>${bankOpts}`;});
+  const instOpts=institutions.filter(i=>i.is_active).map(i=>`<option value="${i.id}">${i.name}</option>`).join('');
+  const ci=document.getElementById('cm-inst');if(ci)ci.innerHTML=`<option value="">-- בחר מוסד --</option>${instOpts}`;
+  const fi=document.getElementById('client-filter-inst');if(fi)fi.innerHTML=`<option value="">כל המוסדות</option>`+institutions.map(i=>`<option value="${i.id}">${i.name}</option>`).join('');
+  const typeOpts=commitTypes.filter(t=>t.is_active).map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  const kt=document.getElementById('kom-type');if(kt)kt.innerHTML=typeOpts||'<option value="">אין סוגים</option>';
+}
+
+function renderDash(){
+  document.getElementById('s-inst').textContent=institutions.filter(i=>i.is_active).length;
+  document.getElementById('s-clients').textContent=clients.filter(c=>c.is_active).length;
+  document.getElementById('s-commits').textContent=commitments.filter(c=>c.is_active).length;
+  document.getElementById('s-total').textContent=fmt(commitments.filter(c=>c.is_active&&!isSuspended(c)).reduce((s,c)=>s+(parseFloat(c.amount)||0),0));
+  document.getElementById('s-files').textContent=fileCount;
+  renderDashTable(false);}
+let dashShowAll=false;
+function toggleDashAll(btn){dashShowAll=!dashShowAll;btn.textContent=dashShowAll?'הצג פחות':'הצג הכל';renderDashTable(dashShowAll);}
+function renderDashTable(all){
+  const sorted=[...institutions].map(i=>({
+    ...i,
+    total:commitments.filter(c=>c.institution_id===i.id&&c.is_active&&!isSuspended(c)).reduce((s,c)=>s+(parseFloat(c.amount)||0),0)
+  })).sort((a,b)=>b.total-a.total);
+  const list=all?sorted:sorted.slice(0,5);
+  const rows=list.map(i=>{
+    const ic=clients.filter(c=>c.institution_id===i.id&&c.is_active).length;
+    return `<tr><td><strong>${i.name}</strong></td><td>${i.institution_code||'—'}</td><td>${ic}</td><td>${fmt(i.total)}</td><td><span class="badge ${i.is_active?'badge-on':'badge-off'}">${i.is_active?'פעיל':'לא פעיל'}</span> ${suspendBadge(i)}</td></tr>`;
+  }).join('');
+  document.getElementById('dash-table').innerHTML=`<table><thead><tr><th>מוסד</th><th>מספר מוסד</th><th>לקוחות</th><th>חיוב חודשי</th><th>סטטוס</th></tr></thead><tbody>${rows||'<tr><td colspan="5"><div class="empty-state"><div class="ei">🏛️</div>אין מוסדות עדיין</div></td></tr>'}</tbody></table>`;
+}
+
+function renderInst(){institutions.sort((a,b)=>a.name.localeCompare(b.name,'he'));
+  const q=(document.getElementById('inst-search')?.value||'').toLowerCase();
+  const list=institutions.filter(i=>!q||i.name.toLowerCase().includes(q)||(i.institution_code||'').includes(q));
+  const tbody=document.getElementById('inst-tbody');
+  tbody.innerHTML=list.length?list.map(i=>`<tr>
+    <td><strong>${i.name}</strong></td><td>${i.institution_code||'—'}</td>
+    <td>${i.default_debit_day||20} לחודש</td><td>${bankName(i.bank_code)}</td>
+    <td>${clients.filter(c=>c.institution_id===i.id).length}</td>
+    <td>${suspendBadge(i)||'—'}</td>
+    <td><span class="badge ${i.is_active?'badge-on':'badge-off'}">${i.is_active?'פעיל':'לא פעיל'}</span></td>
+    <td><div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="openInstModal('${i.id}')">עריכה</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteInst('${i.id}')">מחיקה</button>
+    </div></td>
+  </tr>`).join(''):`<tr><td colspan="8"><div class="empty-state"><div class="ei">🏛️</div>אין מוסדות</div></td></tr>`;
+}
+
+function openInstModal(id=null){
+  editInstId=id;
+  document.getElementById('inst-modal-title').textContent=id?'עריכת מוסד':'מוסד חדש';
+  const inst=id?institutions.find(i=>i.id===id):null;
+  setVal('im-name',inst?.name||'');setVal('im-vat',inst?.vat_number||'');
+  setVal('im-code',inst?.institution_code||'');setVal('im-check',inst?.institution_check_digits||'');setVal('im-bank',inst?.bank_code||'');
+  setVal('im-branch',inst?.branch_code||'');setVal('im-account',inst?.account_number||'');
+  setVal('im-debit-day',inst?.default_debit_day||20);setVal('im-serial-start',inst?.serial_number_next||1);
+  setVal('im-contact-name',inst?.contact_name||'');setVal('im-contact-phone',inst?.contact_phone||'');
+  setVal('im-contact-email',inst?.contact_email||'');setVal('im-suspend',inst?.suspend_type||'none');
+  setVal('im-suspend-from',inst?.suspend_from||'');setVal('im-suspend-until',inst?.suspend_until||'');
+  setVal('im-active',inst?.is_active!==false?'true':'false');
+  toggleSuspendDates('im');document.getElementById('im-account-hint').textContent='';
+  openModal('inst-modal');
+}
+
+async function saveInst(){
+  const name=val('im-name').trim();if(!name){toast('חובה להזין שם מוסד','err');return;}
+  const data={name,vat_number:val('im-vat'),institution_code:val('im-code'),institution_check_digits:val('im-check'),bank_code:val('im-bank')||null,
+    branch_code:val('im-branch'),account_number:val('im-account'),
+    default_debit_day:parseInt(val('im-debit-day')),serial_number_next:parseInt(val('im-serial-start'))||1,
+    contact_name:val('im-contact-name'),contact_phone:val('im-contact-phone'),contact_email:val('im-contact-email'),
+    suspend_type:val('im-suspend'),suspend_from:val('im-suspend-from')||null,suspend_until:val('im-suspend-until')||null,
+    is_active:val('im-active')==='true'};
+  if(editInstId)await sbPatch('masav_institutions',editInstId,data);
+  else await sbPost('masav_institutions',data);
+  closeModal('inst-modal');await loadAll();toast(editInstId?'המוסד עודכן':'המוסד נוסף','ok');
+}
+
+async function deleteInst(id){
+  if(!confirm('למחוק מוסד זה? כל הלקוחות והתחייבויות שלו יימחקו!'))return;
+  await sbDelete('masav_institutions',id);await loadAll();toast('המוסד נמחק','ok');
+}
+
+function renderClients(){clients.sort((a,b)=>{const im=instName(a.institution_id).localeCompare(instName(b.institution_id),'he');return im!==0?im:a.name.localeCompare(b.name,'he');});
+  const q=(document.getElementById('client-search')?.value||'').toLowerCase();
+  const fi=document.getElementById('client-filter-inst')?.value||'';
+  const list=clients.filter(c=>(!q||c.name.toLowerCase().includes(q))&&(!fi||c.institution_id===fi));
+  const tbody=document.getElementById('clients-tbody');
+  tbody.innerHTML=list.length?list.map(c=>{
+    const cc=clientCommits(c.id),mo=clientMonthly(c.id);
+    return `<tr>
+      <td><strong>${c.name}</strong></td><td>${instName(c.institution_id)}</td>
+      <td>${bankName(c.bank_code)}</td><td style="direction:ltr;text-align:right;">${c.account_number||'—'}</td>
+      <td>${cc.length}</td><td>${mo>0?fmt(mo):'—'}</td>
+      <td>${suspendBadge(c)||'—'}</td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn btn-ghost btn-sm" onclick="openClientDetail('${c.id}')">פירוט</button>
+        <button class="btn btn-ghost btn-sm" onclick="openClientModal('${c.id}')">עריכה</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">מחיקה</button>
+      </div></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="8"><div class="empty-state"><div class="ei">👤</div>אין לקוחות</div></td></tr>`;
+}
+
+function openClientModal(id=null){
+  editClientId=id;
+  document.getElementById('client-modal-title').textContent=id?'עריכת לקוח':'לקוח חדש';
+  const c=id?clients.find(x=>x.id===id):null;
+  setVal('cm-name',c?.name||'');setVal('cm-inst',c?.institution_id||'');
+  setVal('cm-bank',c?.bank_code||'');setVal('cm-branch',c?.branch_code||'');
+  setVal('cm-account',c?.account_number||'');setVal('cm-debit-day',c?.debit_day||20);
+  setVal('cm-suspend',c?.suspend_type||'none');setVal('cm-suspend-from',c?.suspend_from||'');
+  setVal('cm-suspend-until',c?.suspend_until||'');setVal('cm-active',c?.is_active!==false?'true':'false');
+  toggleSuspendDates('cm');document.getElementById('cm-account-hint').textContent='';
+  openModal('client-modal');
+}
+
+function onClientInstChange(){
+  const inst=institutions.find(i=>i.id===val('cm-inst'));
+  if(inst?.default_debit_day)setVal('cm-debit-day',inst.default_debit_day);
+}
+
+async function saveClient(){
+  const name=val('cm-name').trim();if(!name){toast('חובה להזין שם לקוח','err');return;}
+  if(!val('cm-inst')){toast('חובה לבחור מוסד','err');return;}
+  const data={name,institution_id:val('cm-inst'),bank_code:val('cm-bank')||null,
+    branch_code:val('cm-branch'),account_number:val('cm-account'),
+    debit_day:parseInt(val('cm-debit-day'))||20,suspend_type:val('cm-suspend'),
+    suspend_from:val('cm-suspend-from')||null,suspend_until:val('cm-suspend-until')||null,
+    is_active:val('cm-active')==='true'};
+  if(editClientId)await sbPatch('masav_clients',editClientId,data);
+  else await sbPost('masav_clients',data);
+  closeModal('client-modal');await loadAll();toast(editClientId?'הלקוח עודכן':'הלקוח נוסף','ok');
+}
+
+async function deleteClient(id){
+  if(!confirm('למחוק לקוח זה?'))return;
+  await sbDelete('masav_clients',id);await loadAll();toast('הלקוח נמחק','ok');
+}
+
+function openClientDetail(cid){
+  currentClientId=cid;
+  const c=clients.find(x=>x.id===cid);
+  document.getElementById('cd-name').textContent=c?.name||'';
+  document.getElementById('cd-inst-name').textContent=instName(c?.institution_id);
+  document.getElementById('clients-list-view').style.display='none';
+  document.getElementById('client-detail-view').style.display='block';
+  renderClientDetail();
+}
+function closeClientDetail(){
+  document.getElementById('clients-list-view').style.display='block';
+  document.getElementById('client-detail-view').style.display='none';
+  currentClientId=null;
+}
+const typeOrder={'הפקדה':1,'הלוואה':2,'תרומה':3};
+function calcCommitDates(c){
+  const now=new Date();
+  const rem=c.total_payments===999?null:Math.max(0,c.total_payments-c.payments_made);
+  const day=c.debit_day||20;
+  // תאריך אחרון שבוצע
+  let lastDate='—';
+  if(c.payments_made>0){
+    const d=new Date(now.getFullYear(),now.getMonth()-rem,day);
+    lastDate=d.toLocaleDateString('he-IL',{month:'2-digit',year:'2-digit'});
+  }
+  // תאריך סיום צפוי
+  let endDate='ללא הגבלה';
+  if(rem!==null&&rem>0){
+    const d=new Date(now.getFullYear(),now.getMonth()+rem,day);
+    endDate=d.toLocaleDateString('he-IL',{month:'2-digit',year:'2-digit'});
+  } else if(rem===0){
+    endDate='הסתיים';
+  }
+  return {lastDate,endDate,rem};
+}
+
+function renderClientDetail(){
+  const cc=commitments.filter(c=>c.client_id===currentClientId)
+    .sort((a,b)=>(typeOrder[typeName(a.commitment_type_id)]||9)-(typeOrder[typeName(b.commitment_type_id)]||9));
+  const el=document.getElementById('cd-commits');
+  if(!cc.length){el.innerHTML=`<div class="empty-state"><div class="ei">📋</div>אין התחייבויות עדיין</div>`;return;}
+  el.innerHTML=cc.map(c=>{
+    const {lastDate,endDate,rem}=calcCommitDates(c);
+    const remStr=c.total_payments===999?'∞':rem;
+    const totalStr=c.total_payments===999?'∞':c.total_payments;
+    const sus=isSuspended(c)?'<span class="badge badge-warn" style="font-size:10px;">מעוכב</span>':'';
+    const isLoan=typeName(c.commitment_type_id)==='הלוואה'||typeName(c.commitment_type_id)==='הפקדה';
+    const grandTotal=isLoan&&c.total_payments!==999?fmt(c.amount*(c.total_payments-c.payments_made)):'';
+    return `<div class="commit-card">
+      <div>
+        <span class="cc-type">${typeName(c.commitment_type_id)}</span>
+        <div class="cc-serial">#${c.serial_number} • ${c.debit_day} לחודש</div>
+        <div style="margin-top:6px;">${sus}<span class="badge ${c.is_active?'badge-on':'badge-off'}">${c.is_active?'פעיל':'לא פעיל'}</span></div>
+      </div>
+      <div>
+        <div class="cc-amount">${fmt(c.amount)} לחודש</div>
+        ${grandTotal?`<div class="cc-total">סה"כ נותר: ${grandTotal}</div>`:''}
+        <div class="cc-progress">בוצעו ${c.payments_made} מתוך ${totalStr} • נותרו: ${remStr}</div>
+        <div class="cc-dates">תשלום אחרון: ${lastDate} • סיום צפוי: ${endDate}</div>
+      </div>
+      <div class="cc-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openCommitModal('${c.id}')">עריכה</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCommit('${c.id}')">מחיקה</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCommitModal(id=null){
+  editCommitId=id;
+  document.getElementById('commit-modal-title').textContent=id?'עריכת התחייבות':'התחייבות חדשה';
+  const k=id?commitments.find(x=>x.id===id):null;
+  if(!id&&currentClientId){
+    const client=clients.find(c=>c.id===currentClientId);
+    const inst=institutions.find(i=>i.id===client?.institution_id);
+    setVal('kom-serial',inst?.serial_number_next||1);
+    setVal('kom-day',inst?.default_debit_day||20);
+  }else{setVal('kom-serial',k?.serial_number||'');setVal('kom-day',k?.debit_day||20);}
+  setVal('kom-type',k?.commitment_type_id||commitTypes[0]?.id||'');
+  setVal('kom-amount',k?.amount||'');setVal('kom-total',k?.total_payments??999);
+  setVal('kom-made',k?.payments_made||0);setVal('kom-start',k?.start_date||new Date().toISOString().split('T')[0]);
+  setVal('kom-suspend',k?.suspend_type||'none');setVal('kom-suspend-from',k?.suspend_from||'');
+  setVal('kom-suspend-until',k?.suspend_until||'');setVal('kom-active',k?.is_active!==false?'true':'false');
+  toggleSuspendDates('kom');openModal('commit-modal');
+}
+
+async function saveCommit(){
+  const amount=parseFloat(val('kom-amount'));
+  if(!amount||amount<=0){toast('חובה להזין סכום חיוב','err');return;}
+  if(!val('kom-type')){toast('חובה לבחור סוג התחייבות','err');return;}
+  const client=clients.find(c=>c.id===currentClientId);
+  const data={client_id:currentClientId,institution_id:client?.institution_id,
+    commitment_type_id:parseInt(val('kom-type')),serial_number:parseInt(val('kom-serial')),
+    amount,debit_day:parseInt(val('kom-day')),total_payments:parseInt(val('kom-total'))||999,
+    payments_made:parseInt(val('kom-made'))||0,start_date:val('kom-start')||null,
+    suspend_type:val('kom-suspend'),suspend_from:val('kom-suspend-from')||null,
+    suspend_until:val('kom-suspend-until')||null,is_active:val('kom-active')==='true'};
+  if(editCommitId){await sbPatch('masav_commitments',editCommitId,data);}
+  else{
+    await sbPost('masav_commitments',data);
+    const inst=institutions.find(i=>i.id===client?.institution_id);
+    if(inst)await sbPatch('masav_institutions',inst.id,{serial_number_next:(inst.serial_number_next||1)+1});
+  }
+  closeModal('commit-modal');await loadAll();renderClientDetail();
+  toast(editCommitId?'ההתחייבות עודכנה':'ההתחייבות נוספה','ok');
+}
+
+async function deleteCommit(id){
+  if(!confirm('למחוק התחייבות זו?'))return;
+  await sbDelete('masav_commitments',id);await loadAll();renderClientDetail();toast('ההתחייבות נמחקה','ok');
+}
+
+function renderTypes(){
+  const tbody=document.getElementById('types-tbody');
+  tbody.innerHTML=commitTypes.length?commitTypes.map(t=>`<tr>
+    <td><strong>${t.name}</strong></td>
+    <td><span class="badge ${t.is_active?'badge-on':'badge-off'}">${t.is_active?'פעיל':'לא פעיל'}</span></td>
+    <td><div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="openTypeModal(${t.id})">עריכה</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteType(${t.id})">מחיקה</button>
+    </div></td>
+  </tr>`).join(''):`<tr><td colspan="3"><div class="empty-state"><div class="ei">📂</div>אין סוגים</div></td></tr>`;
+}
+
+function openTypeModal(id=null){
+  editTypeId=id;
+  document.getElementById('type-modal-title').textContent=id?'עריכת סוג':'סוג התחייבות חדש';
+  const t=id?commitTypes.find(x=>x.id===id):null;
+  setVal('tm-name',t?.name||'');setVal('tm-active',t?.is_active!==false?'true':'false');
+  openModal('type-modal');
+}
+async function saveType(){
+  const name=val('tm-name').trim();if(!name){toast('חובה להזין שם','err');return;}
+  const data={name,is_active:val('tm-active')==='true'};
+  if(editTypeId)await sbPatch('masav_commitment_types',editTypeId,data);
+  else await sbPost('masav_commitment_types',data);
+  closeModal('type-modal');await loadAll();toast('נשמר','ok');
+}
+async function deleteType(id){
+  if(!confirm('למחוק סוג זה?'))return;
+  await sbDelete('masav_commitment_types',id);await loadAll();toast('נמחק','ok');
+}
+
+// ── שער דולר מבנק ישראל ──
+async function fetchDollarRate(){
+  const btn=document.getElementById('rate-btn');
+  const hint=document.getElementById('rate-hint');
+  btn.textContent='טוען...';
+  try {
+    const today=new Date().toISOString().split('T')[0];
+    const url=`https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/EXR/1.0/RER_USD_ILS?startperiod=${today}&endperiod=${today}&format=sdmx-json`;
+    const r=await fetch(url);
+    const d=await r.json();
+    const rate=d?.dataSets?.[0]?.series?.['0:0:0:0']?.observations?.['0']?.[0];
+    if(rate){
+      document.getElementById('rep-rate').value=parseFloat(rate).toFixed(3);
+      hint.textContent=`✓ שער יומי מבנק ישראל: ${parseFloat(rate).toFixed(3)}`;
+      hint.className='acct-hint ok';
+    } else {
+      hint.textContent='לא נמצא שער להיום, הזן ידנית';
+      hint.className='acct-hint bad';
+    }
+  } catch(e){
+    hint.textContent='שגיאה בשליפה, הזן ידנית';
+    hint.className='acct-hint bad';
+  }
+  btn.textContent='🔄 שלוף אוטומטי';
+}
+
+// ── רשימת מוסדות לדוחות ──
+function renderRepInst(){
+  const el=document.getElementById('rep-inst-list');
+  if(!el)return;
+  const day=document.getElementById('rep-day')?.value||'0';
+  el.innerHTML=institutions.filter(i=>i.is_active).map(i=>{
+    const cc=commitments.filter(c=>c.institution_id===i.id&&c.is_active&&(day==='0'||parseInt(c.debit_day)===parseInt(day)));
+    const hasEmail=i.contact_email;
+    return `<label class="inst-check" style="${!hasEmail?'opacity:.5;':''}">
+      <input type="checkbox" value="${i.id}" ${hasEmail?'checked':''} ${!hasEmail?'title="אין מייל איש קשר"':''}>
+      <span class="ic-name">${i.name}</span>
+      <span class="ic-count">${cc.length} חיובים${!hasEmail?' • ⚠️ אין מייל':''}</span>
+    </label>`;
+  }).join('')||'<div style="color:var(--text-dim);padding:8px;">אין מוסדות פעילים</div>';
+}
+
+// ── בניית HTML של דוח למוסד ──
+function buildReportHTML(inst, instCommits, dateStr, rate){
+  const day=instCommits[0]?.debit_day||20;
+  const total=instCommits.reduce((s,c)=>s+(parseFloat(c.amount)||0),0);
+  const rateNum=parseFloat(rate)||1;
+
+  // מיון לפי שם לקוח
+  const sorted=[...instCommits].sort((a,b)=>{
+    const ca=clients.find(x=>x.id===a.client_id);
+    const cb=clients.find(x=>x.id===b.client_id);
+    return (ca?.name||'').localeCompare(cb?.name||'','he');
+  });
+
+  const rows=sorted.map((c,i)=>{
+    const client=clients.find(x=>x.id===c.client_id);
+    const type=typeName(c.commitment_type_id);
+    const isForeign=c.currency===1;
+    const amountILS=isForeign?(c.amount*rateNum):c.amount;
+    const rem=c.total_payments===999?'∞':Math.max(0,c.total_payments-c.payments_made);
+    const bg=i%2===0?'#ffffff':'#f8f9ff';
+    return `<tr style="background:${bg};">
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;">${c.serial_number}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-weight:500;">${client?.name||'—'}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;">${client?.bank_code||''}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;">${client?.branch_code||''}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;direction:ltr;text-align:right;">${client?.account_number||''}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;">${isForeign?'$':'₪'}${parseFloat(c.amount).toLocaleString('he-IL')}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-weight:600;">₪${Math.round(amountILS).toLocaleString('he-IL')}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;">${rem}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;color:#666;">${type} ${c.serial_number}</td>
+    </tr>`;
+  }).join('');
+
+  const d=new Date(dateStr);
+  const dateHe=d.toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
+
+  return `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head><meta charset="UTF-8">
+<style>
+  body{font-family:Arial,sans-serif;margin:0;padding:0;background:#fff;color:#222;direction:rtl;}
+  .header{background:linear-gradient(135deg,#1a3a8f 0%,#2d5be3 100%);color:white;padding:28px 36px;display:flex;justify-content:space-between;align-items:center;}
+  .logo-text{font-size:22px;font-weight:900;letter-spacing:-0.5px;}
+  .logo-sub{font-size:12px;opacity:.8;margin-top:3px;}
+  .inst-info{text-align:left;font-size:13px;opacity:.9;}
+  .body{padding:28px 36px;}
+  .inst-title{font-size:18px;font-weight:800;color:#1a3a8f;margin-bottom:4px;}
+  .inst-meta{font-size:13px;color:#666;margin-bottom:20px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{background:#1a3a8f;color:white;padding:9px 10px;text-align:right;font-weight:600;}
+  .footer{background:#f5f7ff;padding:16px 36px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#888;border-top:2px solid #1a3a8f;}
+  .total-row td{background:#e8eeff;font-weight:800;font-size:14px;color:#1a3a8f;padding:10px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="logo-text">יוסף קראוס</div>
+    <div class="logo-sub">מערכת הוראות קבע • ניהול גביה</div>
+  </div>
+  <div class="inst-info">
+    <div>תאריך חיוב: <strong>${dateHe}</strong></div>
+    <div>יום גביה: <strong>${day} לחודש</strong></div>
+    <div>שער דולר: <strong>₪${rateNum.toFixed(3)}</strong></div>
+  </div>
+</div>
+<div class="body">
+  <div class="inst-title">${inst.name}</div>
+  <div class="inst-meta">קוד מוסד: ${inst.institution_code}${inst.institution_check_digits?'-'+inst.institution_check_digits:''} ${inst.contact_name?'• איש קשר: '+inst.contact_name:''}</div>
+  <table>
+    <thead><tr>
+      <th style="width:60px;">מס' אישי</th>
+      <th>שם לקוח</th>
+      <th style="width:40px;">בנק</th>
+      <th style="width:50px;">סניף</th>
+      <th style="width:90px;">חשבון</th>
+      <th style="width:80px;">סכום</th>
+      <th style="width:80px;">סכום ₪</th>
+      <th style="width:60px;">יתרה</th>
+      <th style="width:90px;">הערה</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr class="total-row">
+      <td colspan="6">סה"כ – ${instCommits.length} חיובים</td>
+      <td>₪${Math.round(total).toLocaleString('he-IL')}</td>
+      <td colspan="2"></td>
+    </tr></tfoot>
+  </table>
+</div>
+<div class="footer">
+  <div>י. קראוס • טל: 04-9887702 • נייד: 050-4116999</div>
+  <div>הופק: ${new Date().toLocaleDateString('he-IL')}</div>
+</div>
+</body></html>`;
+}
+
+// ── תצוגה מקדימה של דוח ──
+function previewReport(){
+  const ids=getSelectedRepInsts();
+  if(!ids.length){toast('בחר לפחות מוסד אחד','err');return;}
+  const instId=ids[0];
+  const inst=institutions.find(i=>i.id===instId);
+  const day=document.getElementById('rep-day').value;
+  const date=document.getElementById('rep-date').value||new Date().toISOString().split('T')[0];
+  const rate=document.getElementById('rep-rate').value||'3.5';
+  const instCommits=commitments.filter(c=>c.institution_id===instId&&c.is_active&&(day==='0'||parseInt(c.debit_day)===parseInt(day)));
+  if(!instCommits.length){toast('אין חיובים למוסד זה','err');return;}
+  const html=buildReportHTML(inst,instCommits,date,rate);
+  const wrap=document.getElementById('report-preview-wrap');
+  const frame=document.getElementById('report-preview-frame');
+  frame.innerHTML=html;
+  wrap.style.display='block';
+  wrap.scrollIntoView({behavior:'smooth'});
+}
+
+function getSelectedRepInsts(){
+  return[...document.querySelectorAll('#rep-inst-list input:checked')].map(cb=>cb.value);
+}
+
+// ── שליחת דוחות ──
+async function sendReports(){
+  const ids=getSelectedRepInsts();
+  if(!ids.length){toast('בחר לפחות מוסד אחד','err');return;}
+  const rate=document.getElementById('rep-rate').value;
+  if(!rate){toast('חובה להזין שער דולר','err');return;}
+  const date=document.getElementById('rep-date').value||new Date().toISOString().split('T')[0];
+  const day=document.getElementById('rep-day').value;
+  const copyMe=document.getElementById('rep-copy-me').checked;
+  const status=document.getElementById('rep-status');
+  status.innerHTML='<div style="color:var(--text-dim);font-size:13px;">שולח דוחות...</div>';
+
+  let sent=0, skipped=0;
+  for(const instId of ids){
+    const inst=institutions.find(i=>i.id===instId);
+    if(!inst?.contact_email){skipped++;continue;}
+    const instCommits=commitments.filter(c=>c.institution_id===instId&&c.is_active&&(day==='0'||parseInt(c.debit_day)===parseInt(day)));
+    if(!instCommits.length){skipped++;continue;}
+    const html=buildReportHTML(inst,instCommits,date,rate);
+    const d=new Date(date);
+    const dateHe=d.toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
+    const subject=`דוח גביה – ${inst.name} – ${dateHe}`;
+    const to=[inst.contact_email];
+    if(copyMe) to.push('ykrauss1@gmail.com');
+    try{
+      const r=await fetch('https://api.resend.com/emails',{
+        method:'POST',
+        headers:{'Authorization':'Bearer re_Uix7s5kP_EPKRNWsFMYtRdsUhvDWTY6kj','Content-Type':'application/json'},
+        body:JSON.stringify({from:'onboarding@resend.dev',to,subject,html})
+      });
+      const res=await r.json();
+      if(res.id) sent++;
+      else skipped++;
+    }catch(e){skipped++;}
+  }
+  status.innerHTML=`<div style="color:var(--accent2);font-size:13px;font-weight:600;">✓ נשלחו ${sent} דוחות${skipped?` • ${skipped} דולגו (אין מייל או אין חיובים)`:''}</div>`;
+}
+  const el=document.getElementById('gen-inst-list');if(!el)return;
+  const day=document.getElementById('gen-day')?.value||'0';
+  el.innerHTML=institutions.filter(i=>i.is_active).map(i=>{
+    const cc=commitments.filter(c=>c.institution_id===i.id&&c.is_active&&(day==='0'||parseInt(c.debit_day)===parseInt(day)));
+    return `<label class="inst-check"><input type="checkbox" value="${i.id}" checked>
+      <span class="ic-name">${i.name}</span><span class="ic-count">${cc.length} התחייבויות</span></label>`;
+  }).join('')||'<div style="color:var(--text-dim);padding:8px;">אין מוסדות פעילים</div>';
+}
+
+function getSelectedInsts(){return[...document.querySelectorAll('#gen-inst-list input:checked')].map(cb=>cb.value);}
+function padL(s,n,c='0'){s=String(s||'');while(s.length<n)s=c+s;return s.slice(0,n);}
+function padR(s,n){s=String(s||'');while(s.length<n)s+=' ';return s.slice(0,n);}
+function fmtDate(d){const dt=new Date(d);return padL(dt.getDate(),2)+padL(dt.getMonth()+1,2)+String(dt.getFullYear()).slice(-2);}
+function agorot(a){return padL(Math.round((parseFloat(a)||0)*100),13);}
+
+function buildMSV(instIds,dateStr,seq,dayFilter){
+  const lines=[];
+  for(const instId of instIds){
+    const inst=institutions.find(i=>i.id===instId);if(!inst)continue;
+    const instCommits=commitments.filter(c=>c.institution_id===instId&&c.is_active&&!isSuspended(c)&&(dayFilter==='0'||parseInt(c.debit_day)===parseInt(dayFilter)));
+    if(!instCommits.length)continue;
+    const vat=padL(inst.vat_number||'0',9),bank=padL(inst.bank_code||'0',3);
+    const code=padL((inst.institution_code||'')+(inst.institution_check_digits||''),8),date=fmtDate(dateStr),seqStr=padL(seq,4);
+    lines.push(`K${vat}${bank}${date}${seqStr}${date}${code}000000${padR(inst.name||'',30)}${padR('KOT',40)}KOT`);
+    let total=0,lineN=1;
+    for(const commit of instCommits){
+      const client=clients.find(c=>c.id===commit.client_id);if(!client)continue;
+      lines.push(`1${vat}${padL(client.bank_code||'0',3)}${padL(client.branch_code||'0',4)}${padL(client.account_number||'0',9)}${agorot(commit.amount)}0000000000000${padR(client.name||'',16)}${padL(lineN,8)}0000000000000000000000000000504000000000000000000`);
+      total+=parseFloat(commit.amount)||0;lineN++;
+    }
+    lines.push(`5${vat}${bank}${date}${seqStr}${padL('',26,'0')}${padL(Math.round(total*100),15)}${padL('',9,'0')}${padL(instCommits.length,8)}`);
+  }
+  lines.push('9'.repeat(132));
+  return lines.join('\r\n');
+}
+
+function generateFile(){
+  const ids=getSelectedInsts();if(!ids.length){toast('בחר לפחות מוסד אחד','err');return;}
+  const date=document.getElementById('gen-date').value;if(!date){toast('בחר תאריך','err');return;}
+  const content=buildMSV(ids,date,document.getElementById('gen-seq').value,document.getElementById('gen-day').value);
+  const blob=new Blob([content],{type:'text/plain;charset=windows-1255'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`MSV.${fmtDate(date)}`;a.click();URL.revokeObjectURL(url);
+  fileCount++;document.getElementById('s-files').textContent=fileCount;toast('הקובץ הורד בהצלחה','ok');
+}
+function previewFile(){
+  const ids=getSelectedInsts();if(!ids.length){toast('בחר לפחות מוסד אחד','err');return;}
+  const date=document.getElementById('gen-date').value;if(!date){toast('בחר תאריך','err');return;}
+  const content=buildMSV(ids,date,document.getElementById('gen-seq').value,document.getElementById('gen-day').value);
+  document.getElementById('preview-card').style.display='block';
+  document.getElementById('preview-box').textContent=content;
+  document.getElementById('preview-card').scrollIntoView({behavior:'smooth'});
+}
+
+function validateILBankAccount(bankCode,branch,account){
+  const b=String(bankCode||'').padStart(2,'0');
+  const ac=String(account||'').replace(/\D/g,'');
+  if(!ac)return{valid:null,msg:''};
+  const noAlgo=['22','23','26','34','68','09'];
+  if(noAlgo.includes(b)){return ac.length>=5&&ac.length<=9?{valid:true,msg:'✓ אורך תקין'}:{valid:false,msg:'✗ אורך חשבון לא תקין'};}
+  if(b==='10'||b==='12'){return ac.length>=5&&ac.length<=9?{valid:true,msg:'✓ פורמט תקין'}:{valid:false,msg:'✗ אורך חשבון לא תקין (5-9)'};}
+  if(b==='11'||b==='17'){
+    if(ac.length<6||ac.length>9)return{valid:false,msg:'✗ אורך חשבון לא תקין (6-9)'};
+    const digits=(String(branch||'').padStart(3,'0')+ac.padStart(9,'0'));
+    let sum=0;const w=[9,8,7,6,5,4,3,2,1,0,0,0];
+    for(let i=0;i<digits.length&&i<w.length;i++)sum+=parseInt(digits[i])*w[i];
+    return sum%11===0?{valid:true,msg:'✓ מספר חשבון תקין'}:{valid:false,msg:'✗ מספר חשבון לא תקין (MOD11)'};
+  }
+  return ac.length>=5&&ac.length<=9?{valid:true,msg:'✓ אורך תקין'}:{valid:false,msg:'✗ אורך חשבון לא תקין'};
+}
+
+function validateClientAccount(){
+  const {valid,msg}=validateILBankAccount(val('cm-bank'),val('cm-branch'),val('cm-account'));
+  const hint=document.getElementById('cm-account-hint'),input=document.getElementById('cm-account');
+  hint.textContent=msg;hint.className='acct-hint '+(valid===true?'ok':valid===false?'bad':'');
+  input.classList.remove('acct-valid','acct-invalid');
+  if(valid===true)input.classList.add('acct-valid');if(valid===false)input.classList.add('acct-invalid');
+}
+function validateInstAccount(){
+  const {valid,msg}=validateILBankAccount(val('im-bank'),val('im-branch'),val('im-account'));
+  const hint=document.getElementById('im-account-hint'),input=document.getElementById('im-account');
+  hint.textContent=msg;hint.className='acct-hint '+(valid===true?'ok':valid===false?'bad':'');
+  input.classList.remove('acct-valid','acct-invalid');
+  if(valid===true)input.classList.add('acct-valid');if(valid===false)input.classList.add('acct-invalid');
+}
+
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');btn.classList.add('active');
+  if(name==='generate'){renderGenInst();renderRepInst();fetchDollarRate();
+    document.getElementById('rep-date').value=new Date().toISOString().split('T')[0];}
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function toggleSuspendDates(p){
+  const type=val(p+'-suspend');
+  document.getElementById(p+'-suspend-from-wrap').style.display=type==='temporary'?'':'none';
+  document.getElementById(p+'-suspend-until-wrap').style.display=type==='temporary'?'':'none';
+}
+function val(id){return document.getElementById(id)?.value||'';}
+function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v??'';}
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast show '+(type==='ok'?'ok':type==='err'?'err':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+</script>
+</body>
+</html>
